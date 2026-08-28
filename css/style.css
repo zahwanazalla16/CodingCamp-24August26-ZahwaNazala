@@ -1,0 +1,663 @@
+/* =========================================================
+   Life Dashboard — css/style.css
+   =========================================================
+   Contents:
+     1. CSS Custom Properties (light + dark themes)
+     2. Reset & Base
+     3. Layout — Header, Dashboard Grid
+     4. Widget Shell (shared)
+     5. Greeting Widget
+     6. Timer Widget
+     7. Task List Widget
+     8. Quick Links Widget
+     9. Shared UI Components (buttons, inputs, errors)
+    10. Utility / Accessibility
+    11. Responsive — Mobile (<768px)
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   1. CSS CUSTOM PROPERTIES — Light Mode (default)
+   --------------------------------------------------------- */
+
+:root {
+  /* Colour palette */
+  --bg:             #f0f4f8;
+  --surface:        #ffffff;
+  --surface-2:      #e8edf3;
+  --text-primary:   #1a202c;
+  --text-secondary: #4a5568;
+  --accent:         #4f46e5;
+  --accent-hover:   #4338ca;
+  --danger:         #e53e3e;
+  --danger-hover:   #c53030;
+  --success:        #38a169;
+  --border:         #cbd5e0;
+  --shadow:         rgba(0, 0, 0, 0.08);
+
+  /* Shared tokens */
+  --radius:     12px;
+  --transition: 0.2s ease;
+}
+
+/* ---------------------------------------------------------
+   1b. DARK MODE — data-theme="dark" on <html>
+   --------------------------------------------------------- */
+
+[data-theme="dark"] {
+  --bg:             #0f1117;
+  --surface:        #1a1d27;
+  --surface-2:      #242736;
+  --text-primary:   #f0f4f8;
+  --text-secondary: #a0aec0;
+  --accent:         #818cf8;
+  --accent-hover:   #6366f1;
+  --danger:         #fc8181;
+  --danger-hover:   #f56565;
+  --success:        #68d391;
+  --border:         #2d3748;
+  --shadow:         rgba(0, 0, 0, 0.4);
+}
+
+/* ---------------------------------------------------------
+   2. RESET & BASE
+   --------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin:     0;
+  padding:    0;
+}
+
+html {
+  font-size: 16px; /* base — min 14px guaranteed via rem below */
+}
+
+body {
+  font-family:      system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                    Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg);
+  color:            var(--text-primary);
+  min-height:       100vh;
+  line-height:      1.6;
+  /* Smooth theme transitions */
+  transition:       background-color var(--transition), color var(--transition);
+}
+
+/* Prevent horizontal overflow at all widths */
+body, main, section {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* ---------------------------------------------------------
+   3. LAYOUT — Header & Dashboard Grid
+   --------------------------------------------------------- */
+
+/* ── Header ── */
+.dashboard-header {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  padding:         1rem 1.5rem;
+  background:      var(--surface);
+  border-bottom:   1px solid var(--border);
+  position:        sticky;
+  top:             0;
+  z-index:         100;
+  box-shadow:      0 2px 8px var(--shadow);
+  transition:      background-color var(--transition), border-color var(--transition);
+}
+
+.dashboard-title {
+  font-size:   1.25rem;
+  font-weight: 700;
+  color:       var(--text-primary);
+}
+
+/* ── Main Grid ── */
+.dashboard-grid {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;          /* 2-column on desktop */
+  grid-template-rows:    auto auto;
+  gap:                   1.25rem;
+  padding:               1.25rem;
+  max-width:             1400px;
+  margin:                0 auto;
+}
+
+/* Greeting spans left column, Timer spans right column (row 1) */
+.widget-greeting { grid-column: 1; grid-row: 1; }
+.widget-timer    { grid-column: 2; grid-row: 1; }
+/* Tasks and Links sit in row 2 side by side */
+.widget-tasks    { grid-column: 1; grid-row: 2; }
+.widget-links    { grid-column: 2; grid-row: 2; }
+
+/* ---------------------------------------------------------
+   4. WIDGET SHELL (shared card styles)
+   --------------------------------------------------------- */
+
+.widget {
+  background:    var(--surface);
+  border-radius: var(--radius);
+  box-shadow:    0 4px 16px var(--shadow);
+  padding:       1.5rem;
+  border:        1px solid var(--border);
+  transition:    background-color var(--transition), border-color var(--transition),
+                 box-shadow var(--transition);
+}
+
+.widget-title {
+  font-size:     1.1rem;
+  font-weight:   600;
+  color:         var(--text-secondary);
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ---------------------------------------------------------
+   5. GREETING WIDGET
+   --------------------------------------------------------- */
+
+.widget-greeting {
+  display:        flex;
+  flex-direction: column;
+  gap:            1rem;
+}
+
+.greeting-clock {
+  text-align: center;
+}
+
+/* Large time display */
+.time-display {
+  font-size:   clamp(2.5rem, 5vw, 3.5rem);
+  font-weight: 700;
+  color:       var(--accent);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+
+.date-display {
+  font-size:   1rem;
+  color:       var(--text-secondary);
+  margin-top:  0.25rem;
+}
+
+.greeting-text {
+  font-size:   1.3rem;
+  font-weight: 600;
+  color:       var(--text-primary);
+  margin-top:  0.5rem;
+}
+
+/* Name row */
+.name-row {
+  display:     flex;
+  gap:         0.5rem;
+  align-items: center;
+  flex-wrap:   wrap;
+}
+
+.name-row .input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---------------------------------------------------------
+   6. TIMER WIDGET
+   --------------------------------------------------------- */
+
+.widget-timer {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            1rem;
+  text-align:     center;
+}
+
+/* Large MM:SS display */
+.timer-display {
+  font-size:   clamp(3rem, 8vw, 5rem);
+  font-weight: 700;
+  color:       var(--accent);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+/* Timer button row */
+.timer-controls {
+  display:     flex;
+  gap:         0.75rem;
+  flex-wrap:   wrap;
+  justify-content: center;
+}
+
+/* Alert banner — hidden by default */
+.timer-alert {
+  display:         none;
+  align-items:     center;
+  gap:             0.75rem;
+  background:      var(--success);
+  color:           #fff;
+  padding:         0.75rem 1.25rem;
+  border-radius:   var(--radius);
+  font-weight:     600;
+  width:           100%;
+  justify-content: center;
+  flex-wrap:       wrap;
+}
+
+/* Shown via JS adding .visible class */
+.timer-alert.visible {
+  display: flex;
+}
+
+/* Duration row */
+.duration-row {
+  display:     flex;
+  align-items: center;
+  gap:         0.5rem;
+  flex-wrap:   wrap;
+  justify-content: center;
+  font-size:   0.875rem;
+  color:       var(--text-secondary);
+}
+
+.label-inline {
+  font-size: 0.875rem;
+  color:     var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------
+   7. TASK LIST WIDGET
+   --------------------------------------------------------- */
+
+.widget-tasks {
+  display:        flex;
+  flex-direction: column;
+  gap:            0.75rem;
+}
+
+/* Add task row */
+.input-row {
+  display:   flex;
+  gap:       0.5rem;
+  flex-wrap: wrap;
+}
+
+.input-row .input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 3-element row (Quick Links) */
+.input-row-3 {
+  display:   flex;
+  gap:       0.5rem;
+  flex-wrap: wrap;
+}
+
+.input-row-3 .input:first-of-type  { flex: 1;   min-width: 100px; }
+.input-row-3 .input:nth-of-type(2) { flex: 2;   min-width: 140px; }
+
+/* Task list */
+.task-list {
+  list-style: none;
+  display:    flex;
+  flex-direction: column;
+  gap:        0.5rem;
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 0.25rem; /* allow scrollbar without clipping */
+}
+
+/* Scrollbar styling (Webkit) */
+.task-list::-webkit-scrollbar {
+  width: 6px;
+}
+.task-list::-webkit-scrollbar-track {
+  background:    var(--surface-2);
+  border-radius: 3px;
+}
+.task-list::-webkit-scrollbar-thumb {
+  background:    var(--border);
+  border-radius: 3px;
+}
+
+/* Task items */
+.task-item {
+  display:     flex;
+  align-items: center;
+  gap:         0.5rem;
+  padding:     0.5rem 0.75rem;
+  background:  var(--surface-2);
+  border-radius: calc(var(--radius) - 4px);
+  border:      1px solid var(--border);
+  transition:  background-color var(--transition);
+}
+
+.task-item:hover {
+  background: var(--surface);
+}
+
+/* Sort button in task toolbar */
+.task-toolbar {
+  display:     flex;
+  align-items: center;
+  gap:         0.5rem;
+  flex-wrap:   wrap;
+}
+
+.task-toolbar .input {
+  flex: 1;
+  min-width: 0;
+}
+
+.task-checkbox {
+  flex-shrink: 0;
+  width:       18px;
+  height:      18px;
+  cursor:      pointer;
+  accent-color: var(--accent);
+}
+
+.task-text {
+  flex:        1;
+  font-size:   0.95rem;
+  color:       var(--text-primary);
+  word-break:  break-word;
+}
+
+/* Completed task strikethrough */
+.task-text.task-completed {
+  text-decoration: line-through;
+  color:           var(--text-secondary);
+  opacity:         0.7;
+}
+
+/* Inline edit input */
+.task-edit-input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Empty state message */
+.task-empty,
+.links-empty {
+  color:     var(--text-secondary);
+  font-size: 0.9rem;
+  font-style: italic;
+  padding:   0.5rem 0;
+}
+
+/* ---------------------------------------------------------
+   8. QUICK LINKS WIDGET
+   --------------------------------------------------------- */
+
+.widget-links {
+  display:        flex;
+  flex-direction: column;
+  gap:            0.75rem;
+}
+
+/* Wrapping grid for link cards */
+.quick-links-list {
+  display:   flex;
+  flex-wrap: wrap;
+  gap:       0.75rem;
+  align-items: flex-start;
+}
+
+/* Individual link card — bordered frame with relative positioning */
+.link-card {
+  position:      relative;
+  background:    var(--surface-2);
+  border:        1px solid var(--border);
+  border-radius: var(--radius);
+  padding:       0.6rem 2rem 0.6rem 0.9rem; /* right padding leaves room for × btn */
+  min-width:     90px;
+  max-width:     180px;
+  transition:    background-color var(--transition), border-color var(--transition),
+                 box-shadow var(--transition);
+}
+
+.link-card:hover {
+  background:  var(--surface);
+  box-shadow:  0 2px 8px var(--shadow);
+  border-color: var(--accent);
+}
+
+/* Link label inside the card */
+.link-card-anchor {
+  display:         block;
+  color:           var(--accent);
+  font-size:       0.875rem;
+  font-weight:     600;
+  text-decoration: none;
+  white-space:     nowrap;
+  overflow:        hidden;
+  text-overflow:   ellipsis;
+}
+
+.link-card-anchor:hover {
+  text-decoration: underline;
+}
+
+/* Small × delete button — pinned to top-right corner */
+.link-card-delete {
+  position:        absolute;
+  top:             4px;
+  right:           4px;
+  width:           18px;
+  height:          18px;
+  padding:         0;
+  border:          none;
+  border-radius:   50%;
+  background:      var(--danger);
+  color:           #fff;
+  font-size:       0.8rem;
+  line-height:     1;
+  cursor:          pointer;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  opacity:         0.7;
+  transition:      opacity var(--transition), background-color var(--transition);
+}
+
+.link-card-delete:hover {
+  opacity:    1;
+  background: var(--danger-hover);
+}
+
+/* ---------------------------------------------------------
+   9. SHARED UI COMPONENTS
+   --------------------------------------------------------- */
+
+/* ── Buttons ── */
+.btn {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             0.35rem;
+  padding:         0.5rem 1rem;
+  border:          none;
+  border-radius:   var(--radius);
+  font-size:       0.9rem;
+  font-weight:     600;
+  cursor:          pointer;
+  transition:      background-color var(--transition), opacity var(--transition),
+                   box-shadow var(--transition);
+  white-space:     nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor:  not-allowed;
+}
+
+.btn-accent {
+  background: var(--accent);
+  color:      #fff;
+}
+
+.btn-accent:not(:disabled):hover {
+  background: var(--accent-hover);
+}
+
+.btn-secondary {
+  background: var(--surface-2);
+  color:      var(--text-primary);
+  border:     1px solid var(--border);
+}
+
+.btn-secondary:not(:disabled):hover {
+  background: var(--border);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color:      #fff;
+}
+
+.btn-danger:not(:disabled):hover {
+  background: var(--danger-hover);
+}
+
+.btn-sm {
+  padding:   0.3rem 0.65rem;
+  font-size: 0.8rem;
+}
+
+/* ── Inputs ── */
+.input {
+  padding:       0.5rem 0.75rem;
+  border:        1px solid var(--border);
+  border-radius: var(--radius);
+  background:    var(--surface);
+  color:         var(--text-primary);
+  font-size:     0.9rem;
+  font-family:   inherit;
+  transition:    border-color var(--transition), background-color var(--transition);
+  width:         100%;
+}
+
+.input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.input:focus {
+  outline:       none;
+  border-color:  var(--accent);
+  box-shadow:    0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.input-sm {
+  padding:   0.35rem 0.6rem;
+  font-size: 0.85rem;
+  width:     5rem;
+}
+
+/* ── Error messages ── */
+.error-msg {
+  font-size: 0.825rem;
+  color:     var(--danger);
+  margin-top: 0.25rem;
+}
+
+/* ── Edit inline error ── */
+.edit-error {
+  font-size:  0.8rem;
+  color:      var(--danger);
+  margin-left: 0.25rem;
+}
+
+/* ---------------------------------------------------------
+   10. UTILITY / ACCESSIBILITY
+   --------------------------------------------------------- */
+
+/* Visually hidden (screen-reader only) */
+.sr-only {
+  position:   absolute;
+  width:      1px;
+  height:     1px;
+  padding:    0;
+  margin:     -1px;
+  overflow:   hidden;
+  clip:       rect(0,0,0,0);
+  white-space: nowrap;
+  border:     0;
+}
+
+/* Focus-visible outline on all interactive elements */
+:focus-visible {
+  outline:        3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------
+   11. RESPONSIVE — Mobile (<768px)
+   --------------------------------------------------------- */
+
+@media (max-width: 767px) {
+  /* Switch to single-column layout */
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows:    auto;
+    padding:               0.75rem;
+    gap:                   0.75rem;
+  }
+
+  .widget-greeting,
+  .widget-timer,
+  .widget-tasks,
+  .widget-links {
+    grid-column: 1;
+    grid-row:    auto;
+  }
+
+  /* Scale down very large text to avoid overflow */
+  .time-display    { font-size: clamp(2rem, 12vw, 3rem); }
+  .timer-display   { font-size: clamp(2.5rem, 14vw, 4rem); }
+  .greeting-text   { font-size: 1.1rem; }
+
+  /* Stack 3-element quick links input on narrow screens */
+  .input-row-3 {
+    flex-direction: column;
+  }
+
+  .input-row-3 .input:first-of-type,
+  .input-row-3 .input:nth-of-type(2) {
+    width: 100%;
+    flex:  unset;
+  }
+
+  /* Timer controls wrap nicely */
+  .timer-controls {
+    gap: 0.5rem;
+  }
+
+  /* Header */
+  .dashboard-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .dashboard-title {
+    font-size: 1rem;
+  }
+}
+
+/* Extra safety: ensure no content is hidden at very wide screens */
+@media (min-width: 1400px) {
+  .dashboard-grid {
+    padding: 1.5rem calc((100vw - 1400px) / 2 + 1.5rem);
+    max-width: unset;
+  }
+}
